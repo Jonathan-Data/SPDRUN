@@ -1,16 +1,29 @@
+import Leaderboard from '@/components/leaderboard';
 import VideoFeed from '@/components/video-feed';
+import Categories from '@/components/categories';
 
 export default function Home() {
-  return (
-      <main className="min-h-screen bg-gray-900 p-4 md:p-8">
-        <div className="flex flex-col md:flex-row gap-4 md:gap-8">
-          <div className="w-full md:w-1/2 bg-gray-800 rounded-lg p-4">
-            <h2 className="text-xl font-bold mb-4">🔥 Trending Speedruns</h2>
-            <VideoFeed /> {/* Replaced the placeholder */}
-          </div>
+    return (
+        <main className="min-h-screen bg-gray-900 text-white">
+            {/* Main grid container */}
+            <div className="container mx-auto px-4 py-8 grid grid-cols-12 gap-6">
 
-          {/* ... keep your leaderboard code ... */}
-        </div>
-      </main>
-  );
+                {/* Left Column - Leaderboard (20% width) */}
+                <div className="col-span-12 md:col-span-3 lg:col-span-2">
+                    <Leaderboard />
+                </div>
+
+                {/* Middle Column - Video Feed (60% width) */}
+                <div className="col-span-12 md:col-span-6 lg:col-span-8">
+                    <VideoFeed />
+                </div>
+
+                {/* Right Column - Categories (20% width) */}
+                <div className="col-span-12 md:col-span-3 lg:col-span-2">
+                    <Categories />
+                </div>
+
+            </div>
+        </main>
+    );
 }

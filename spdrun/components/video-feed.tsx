@@ -1,56 +1,49 @@
 "use client";
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+
+type Video = {
+    id: string;
+    title: string;
+    videoUrl: string;
+    runner: string;
+    time: string;
+    views: number;
+    thumbnailUrl?: string;
+};
 
 export default function VideoFeed() {
-    const videos = [
-        { id: 1, url: '/videos/speedrun1.mp4', title: 'Minecraft Any% World Record' },
-        { id: 2, url: '/videos/speedrun2.mp4', title: 'Celeste Farewell 100%' },
-    ];
-
+    const [videos, setVideos] = useState<Video[]>([]);
+    const [loading, setLoading] = useState(true);
     const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
     useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach(entry => {
-                    const video = entry.target as HTMLVideoElement;
-                    if (entry.isIntersecting) {
-                        video.play().catch(error => {
-                            console.error('Video playback failed:', error);
-                            // Optional: Show user feedback
-                        });
-                    } else {
-                        video.pause();
-                    }
-                });
-            },
-            { threshold: 0.5 }
-        );
-
-        videoRefs.current.forEach(video => {
-            if (video) observer.observe(video);
+        const q = query(collection(db, 'videos'), orderBy('timestamp', 'desc'));
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const videosData = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            })) as Video[];
+            setVideos(videosData);
+            setLoading(false);
         });
 
-        return () => observer.disconnect();
+        return () => unsubscribe();
     }, []);
 
+    if (loading) return <div className="text-center py-8">Loading speedruns...</div>;
+
     return (
-        <div className="h-screen snap-y snap-mandatory overflow-y-scroll">
-            {videos.map((video, index) => (
-                <div key={video.id} className="h-screen snap-start relative">
+        <div className="space-y-6">
+            {videos.map((video, i) => (
+                <div key={video.id} className="bg-gray-800 rounded-xl overflow-hidden">
                     <video
-                        ref={(el) => {
-                            videoRefs.current[index] = el;
-                        }}
-                        src={video.url}
-                        loop
-                        muted
-                        className="w-full h-full object-cover"
-                        playsInline // Important for mobile Safari
+                        ref={el => videoRefs.current[i] = el}
+                        src={video.videoUrl}
+                        // ... other video props
                     />
-                    <div className="absolute bottom-4 left-4 text-white">
-                        <h3 className="text-xl font-bold">{video.title}</h3>
-                    </div>
+                    {/* ... video metadata display ... */}
                 </div>
             ))}
         </div>
