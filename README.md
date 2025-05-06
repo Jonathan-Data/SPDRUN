@@ -1,4 +1,4 @@
-# 🚀 SPDRUN 
+# SPDRUN 
 **TikTok for Speedrunners** | Binge-watch short, addictive speedruns
 
 [![Next.js](https://img.shields.io/badge/Next.js-13-blue?logo=next.js)](https://nextjs.org/)
